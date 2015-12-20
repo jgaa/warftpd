@@ -1,0 +1,6 @@
+[submodule "externals/warlib"]
+	path = externals/warlib
+	url = ssh://jgaa@git.code.sf.net/p/warlib/warlib
+[submodule "externals/wfde"]
+	path = externals/wfde
+	url = ssh://jgaa@git.code.sf.net/p/wfde/wfde

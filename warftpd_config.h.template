@@ -1,0 +1,4 @@
+#pragma once
+// Build Configuration settings for War FTP Daemon
+
+//#cmakedefine WFDE_WITH_TLS 1
