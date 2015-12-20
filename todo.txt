@@ -1,0 +1,23 @@
+War FTP Daemon TODO
+
+Tasks:
+===========================================================
+ - Create the repository
+ - Import warlib
+ - Import wfde
+ - Make sure all the unit tests and functional tests can be executed.
+ - Create initial, skeleton daemon.
+ - Create unit tests 
+ - Create functional tests.
+ - Choose database library and import it [need sqlite and postgres]
+ - Decide upon UI technology [QT, AngularJS, others??]
+ - Set up feature specs and roadmap for alpha, beta and initial release
+ 
+
+Bugs:
+===========================================================
+
+Stack:
+===========================================================
+
+
