@@ -65,16 +65,19 @@ bool ParseCommandLine(int argc, char *argv[], log::LogEngine& logger,
         ("config-file,c",
             po::value<string>(&conf.conf_file)->default_value(conf.conf_file),
             "Configuration file")
-        ("console-log,C",
+        ("console-log,C", po::value<string>(),
             "Log-level for the console-log")
         ("log-level,L", 
+            po::value<string>(),
             "Log-level for the log-file")
         ("log-file", 
+            po::value<string>(),
             "Name of the log-file")
         ("truncate-log",
+            po::value<bool>(),
             "Truncate the log-file if it already exists")
 #ifndef WIN32
-        ("daemon", "Run as a system daemon")
+        ("daemon", po::value<string>(), "Run as a system daemon")
 #endif
         ;
 
@@ -155,8 +158,12 @@ int main(int argc, char *argv[]) {
                         
             if (!ParseCommandLine(argc, argv, logger, options))
                 return -1;
-
-            LOG_INFO << WARFTPD_PROGRAM_NAME << warftpd::Version() << " starting up...";
+            
+            if (!boost::filesystem::exists(options.conf_file)) {
+                cerr << "The configuration-file \""  << options.conf_file
+                    << "\" was not found." << endl;
+                    return -1;
+            }
             
             conf = war::wfde::Configuration::GetConfiguration(options.conf_file);
             WAR_ASSERT(conf != nullptr);
@@ -180,6 +187,9 @@ int main(int argc, char *argv[]) {
         }
 
         auto daemon = warftpd::Daemon::Create(conf);
+        
+        LOG_INFO << WARFTPD_PROGRAM_NAME << ' ' << warftpd::Version() << " starting up...";
+        
         daemon->Start();
 
         /* We now put the main-thread to sleep.

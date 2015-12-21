@@ -5,8 +5,8 @@ Tasks:
  v Create the repository
  v Import warlib
  v Import wfde
- ~ Make sure all the unit tests and functional tests can be executed.
- >> Create initial, skeleton daemon.
+ v Make sure all the unit tests and functional tests can be executed.
+ v Create initial, skeleton daemon.
  - Choose database library and import it [need sqlite and postgres]
  - Create object database and add user authentication/permissions there
  - Add system tree to the object database
