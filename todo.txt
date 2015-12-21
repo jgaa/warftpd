@@ -7,6 +7,7 @@ Tasks:
  v Import wfde
  v Make sure all the unit tests and functional tests can be executed.
  v Create initial, skeleton daemon.
+ - Configure doxygen
  - Choose database library and import it [need sqlite and postgres]
  - Create object database and add user authentication/permissions there
  - Add system tree to the object database
@@ -22,7 +23,4 @@ Bugs:
 
 Stack:
 ===========================================================
- - Add logging to Daemon. Initialize from config
- - Implement Daemon::Start/Shutdown/Wait
- - command-line options from command-line and config file
 
