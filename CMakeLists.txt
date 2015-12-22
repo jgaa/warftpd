@@ -1,11 +1,4 @@
-# Main project definition for vgtd
-#
-# This project is currently being developed with Debian "testing", using the
-# latest clang++ and g++ compilers and libraries.
-#
-# Supported compilers:
-#  - Clang 3.5.1 [Tested with Debian jessie]
-#  - g++ 4.9     [Tested with Debian jessie]
+# Main project definition for warftpd
 
 cmake_minimum_required(VERSION 3.0)
 project (warftpd)
@@ -30,6 +23,10 @@ endif()
 
 if (NOT DEFINED WFDE_ROOT_DIR)
     set(WFDE_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/wfde)
+endif()
+
+if (NOT DEFINED SQLPP_ROOT_DIR)
+    set(SQLPP_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/sqlpp11)
 endif()
 
 # Tell warlib's cmake setup that it's embedded into a higher level project
@@ -75,6 +72,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/include
     ${WARLIB_ROOT_DIR}/include
     ${WFDE_ROOT_DIR}/include
+    ${SQLPP_ROOT_DIR}/include
     )
 
 add_subdirectory(${WARLIB_ROOT_DIR})

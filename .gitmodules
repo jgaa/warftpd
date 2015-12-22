@@ -4,3 +4,6 @@
 [submodule "externals/wfde"]
 	path = externals/wfde
 	url = ssh://jgaa@git.code.sf.net/p/wfde/wfde
+[submodule "externals/sqlpp11"]
+	path = externals/sqlpp11
+	url = https://github.com/rbock/sqlpp11.git
