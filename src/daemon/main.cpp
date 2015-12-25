@@ -32,6 +32,7 @@ struct CmdLineOptions
     boost::optional<string> console_log_level;
     boost::optional<string> log_level;
     boost::optional<string> log_file;
+    boost::optional<bool> bootstrap;
 };
 
 void SleepUntilDoomdsay()
@@ -76,6 +77,8 @@ bool ParseCommandLine(int argc, char *argv[], log::LogEngine& logger,
         ("truncate-log",
             po::value<bool>(),
             "Truncate the log-file if it already exists")
+        ("bootstrap",
+         "Bootstrap the database (erases all data)")
 #ifndef WIN32
         ("daemon", po::value<string>(), "Run as a system daemon")
 #endif
@@ -127,6 +130,9 @@ bool ParseCommandLine(int argc, char *argv[], log::LogEngine& logger,
     if (vm.count("io-queue-size")) {
         conf.max_io_thread_queue_capacity = vm["io-queue-size"].as<int>();
     }
+    if (vm.count("bootstrap")) {
+        conf.bootstrap = true;
+    }
 
     return true;
 }
@@ -177,6 +183,9 @@ int main(int argc, char *argv[]) {
             APPLY_IF(options.num_io_threads, "/System/NumIoThreads");
             APPLY_IF(options.max_io_thread_queue_capacity, "/System/MaxIoThreadQueueCapacity");
             APPLY_IF(options.daemon, "/System/Daemon");
+            if (options.bootstrap && *options.bootstrap) {
+                conf->SetValue("/Database/Bootstrap", "1");
+            }
             
     #ifndef WIN32
             if (boost::lexical_cast<bool>(conf->GetValue("/System/Daemon", "0"))) {

@@ -7,3 +7,6 @@
 [submodule "externals/sqlpp11"]
 	path = externals/sqlpp11
 	url = https://github.com/rbock/sqlpp11.git
+[submodule "externals/sqlpp11-connector-sqlite3"]
+	path = externals/sqlpp11-connector-sqlite3
+	url = https://github.com/rbock/sqlpp11-connector-sqlite3.git

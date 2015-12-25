@@ -29,6 +29,10 @@ if (NOT DEFINED SQLPP_ROOT_DIR)
     set(SQLPP_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/sqlpp11)
 endif()
 
+if (NOT DEFINED SQLPP_SQLITE_ROOT_DIR)
+    set(SQLPP_SQLITE_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/sqlpp11-connector-sqlite3)
+endif()
+
 # Tell warlib's cmake setup that it's embedded into a higher level project
 set(EMBEDDED_WARLIB ON)
 set(EMBEDDED_WFDELIB ON)
@@ -73,11 +77,13 @@ include_directories(
     ${WARLIB_ROOT_DIR}/include
     ${WFDE_ROOT_DIR}/include
     ${SQLPP_ROOT_DIR}/include
+    ${SQLPP_SQLITE_ROOT_DIR}/include
     )
 
 add_subdirectory(${WARLIB_ROOT_DIR})
 add_subdirectory(${WFDE_ROOT_DIR})
 add_subdirectory(src)
+add_subdirectory(externals)
 
 if (WITH_APIDOC)
     find_package(Doxygen)

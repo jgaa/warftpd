@@ -15,7 +15,7 @@ public:
     
     template <typename T>
     struct ObjectList {
-        std::deque<T::ptr_t> object;
+        std::deque<typename T::ptr_t> object;
     };
     
     Database() = default;
@@ -37,7 +37,8 @@ public:
      * 
      * @return All the nodes that matches the key.
      */
-    ObjectList<Server> FindServer(const std::string& key = "");
+    virtual ObjectList<war::wfde::Server> 
+    FindServer(const std::string& key = "") = 0;
     
     /*! Search for the key.
      * 
@@ -45,16 +46,8 @@ public:
      * 
      * @return All the nodes that matches the key.
      */
-    ObjectList<Host> FindHost(const Server& parent, const std::string& key = "");
-    
-    /*! Search for the key.
-     * 
-     * @param Key to search for. May contain SQL wild-chard.
-     *      An empty string matches everything.
-     * 
-     * @return All the nodes that matches the key.
-     */
-    ObjectList<Protocol> FindProtocol(const Host& parent, const std::string& key = "");
+    virtual ObjectList<war::wfde::Host> 
+    FindHost(const war::wfde::Server& parent, const std::string& key = "") = 0;
     
     /*! Search for the key.
      * 
@@ -63,7 +56,18 @@ public:
      * 
      * @return All the nodes that matches the key.
      */
-    ObjectList<Interface> FindInterface(const Protocol& parent, const std::string& key = "");
+    virtual ObjectList<war::wfde::Protocol> 
+    FindProtocol(const war::wfde::Host& parent, const std::string& key = "") = 0;
+    
+    /*! Search for the key.
+     * 
+     * @param Key to search for. May contain SQL wild-chard.
+     *      An empty string matches everything.
+     * 
+     * @return All the nodes that matches the key.
+     */
+    virtual ObjectList<war::wfde::Interface> 
+    FindInterface(const war::wfde::Protocol& parent, const std::string& key = "") = 0;
     
     /*! Load all nodes relevant to the supplied entity. 
      * 
@@ -71,7 +75,8 @@ public:
      *      the entire node-tree, staring with the Server(s) are returned.
      */
     
-    ObjectList<Entity> LoadAll(const Entity *parent = nullptr);
+    virtual ObjectList<war::wfde::Entity> 
+    LoadAll(const war::wfde::Entity *parent = nullptr) = 0;
     
     /*! Bootstrap the database
      * 
@@ -79,10 +84,9 @@ public:
      * 
      * This method is meant to be run when the server is installed.
      * 
-     * @param adminName User name for the administrator of the warftpd server.
-     * @param adminPasswd Password in clear text of the administrator of the warftpd server.
+     * For databases with authentication (like postgresql), the database must exist.
      */
-    void Bootstrap(const std::string& adminName, const std::string adminPasswd);
+    virtual void  Bootstrap() = 0;
     
     /*! Create an instance of the Database object. 
      * 
@@ -90,7 +94,7 @@ public:
      * database driver selected by the configuration, it is initialized under the
      * hood.
      */    
-    static Database CreateInstance(war::wfde::Configuration& conf);
+    static Database::ptr_t CreateInstance(const war::wfde::Configuration& conf);
 };
 
 }

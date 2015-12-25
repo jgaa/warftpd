@@ -4,6 +4,7 @@
 #include "war_error_handling.h"
 #include <tasks/WarThreadpool.h>
 #include "warftpd/warftpd.h"
+#include "warftpd/Database.h"
 #include "Daemon.h"
 
 using namespace std;
@@ -61,6 +62,11 @@ public:
         thread_pool_ = std::make_unique<Threadpool>(
             boost::lexical_cast<int>(conf_->GetValue("/System/NumIoThreads", "0")),
             boost::lexical_cast<int>(conf_->GetValue("/System/MaxIoThreadQueueCapacity", "1024")));
+        db_ = Database::CreateInstance(*conf_);
+        if (boost::lexical_cast<bool>(conf_->GetValue("/Database/Bootstrap", "0"))) {
+            LOG_NOTICE_FN << "Bootstrapping the database. Any existing data will be deleted.";
+            db_->Bootstrap();
+        }
     }
     
     void Shutdown() override {
@@ -72,8 +78,9 @@ public:
     }
 
 private:
-    Configuration::ptr_t conf_;
+    Database::ptr_t db_;
     std::unique_ptr<Threadpool> thread_pool_;
+    Configuration::ptr_t conf_;
 };
     
 } // impl

@@ -19,5 +19,5 @@ endif()
 
 add_executable(warftpd ${FTPD_SOURCES})
 set_target_properties(warftpd PROPERTIES DEBUG_OUTPUT_NAME warftpdD)
-target_link_libraries(warftpd ${DEFAULT_LIBRARIES} wfde)
+target_link_libraries(warftpd ${DEFAULT_LIBRARIES} libwarftpd)
 
