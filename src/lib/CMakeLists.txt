@@ -3,6 +3,7 @@ project(vgtdsl)
 set(ACTUAL_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/db/DatabaseImplSqlite.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/db/DatabaseImpl.cpp
+        AuthManagerImpl.cpp
     )
 set(HEADERS
    ${CMAKE_CURRENT_SOURCE_DIR}/db/ 

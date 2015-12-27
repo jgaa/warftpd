@@ -19,6 +19,8 @@
 #endif
 
 namespace warftpd {
+    
+class Database;
 
 /*! War FTP Daemon version */
 enum class Version
@@ -27,6 +29,12 @@ enum class Version
     MINOR = 0
 };
 
+enum AuthTypes {
+    ANONYMOUS_USER = 0,
+    CLEAR_PASSWD = 1
+};
+
+war::wfde::AuthManager::ptr_t CreateAuthManager(std::shared_ptr<Database>& db);
 
 } // namespace
 

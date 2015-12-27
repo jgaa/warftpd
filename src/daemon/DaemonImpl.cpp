@@ -1,4 +1,10 @@
 
+/* TODO:
+ *   - Implement load of all objects
+ *   - Implement shutdown
+ */
+
+#include <vector>
 #include <boost/lexical_cast.hpp>
 #include <log/WarLog.h>
 #include "war_error_handling.h"
@@ -67,6 +73,8 @@ public:
             LOG_NOTICE_FN << "Bootstrapping the database. Any existing data will be deleted.";
             db_->Bootstrap();
         }
+        
+        LoadAllEntities();
     }
     
     void Shutdown() override {
@@ -78,9 +86,40 @@ public:
     }
 
 private:
+    void LoadAllEntities() {
+        for(auto& sc : db_->FindServer().conf) {
+            if (!boost::lexical_cast<bool>(sc->GetValue("/Enabled", "1")))
+                continue;
+            
+            // Instantiate the server
+            auto server = CreateServer(sc, *thread_pool_);
+            
+            // Load hosts
+            for(auto& hc : db_->FindHost(*server).conf) {
+                auto am = CreateAuthManager(db_);
+                auto host = CreateHost(*server, am, hc);
+                
+                // TODO: Add permissions
+                
+                for(auto& pc : db_->FindProtocol(*host).conf) {
+                    
+                    // TODO: Merge the interface definitions into the configuration
+                    //      or refactor prot->AddInterfaces() to deal with one interface
+                    //      definition at the time.
+                    
+                    auto prot = CreateProtocol(host.get(), pc);
+                    prot->AddInterfaces();
+                }
+            }
+            
+            servers_.push_back(move(server));
+        }
+    }
+    
     Database::ptr_t db_;
     std::unique_ptr<Threadpool> thread_pool_;
     Configuration::ptr_t conf_;
+    vector<Server::ptr_t> servers_;
 };
     
 } // impl

@@ -11,11 +11,11 @@ class Database
 {
 public:
     using ptr_t = std::shared_ptr<Database>;
-    using id_t = boost::uuids::uuid;
+    using id_t = uint32_t;
     
-    template <typename T>
     struct ObjectList {
-        std::deque<typename T::ptr_t> object;
+        war::wfde::Entity::Type type;
+        std::deque<war::wfde::Configuration::ptr_t> conf;
     };
     
     Database() = default;
@@ -25,10 +25,29 @@ public:
     Database& operator = (const Database&) = delete;
     Database& operator = (Database&&) = delete;
     
-    war::wfde::Server::ptr_t GetServer(const id_t& id);
-    war::wfde::Host::ptr_t GetHost(const id_t& id);
-    war::wfde::Protocol::ptr_t GetProtocol(const id_t& id);
-    war::wfde::Interface::ptr_t GetInterface(const id_t& id);
+//     war::wfde::Server::ptr_t GetServer(const id_t& id);
+//     war::wfde::Host::ptr_t GetHost(const id_t& id);
+//     war::wfde::Protocol::ptr_t GetProtocol(const id_t& id);
+//     war::wfde::Interface::ptr_t GetInterface(const id_t& id);
+    
+    struct UserData {
+        std::string login_name;
+        AuthTypes auth_type;
+        std::string passwd;
+        boost::uuids::uuid id;
+        
+        ~UserData() {
+            // Clear the data in the password.
+            for(auto& ch : passwd) {
+                ch = ' ';
+            }
+            passwd.clear();
+        }
+    };
+    
+    /*! Lookup a user in the database */
+    virtual UserData FindUser(const boost::uuids::uuid parent, 
+                              const std::string& loginName) = 0;
     
     /*! Search for the key.
      * 
@@ -37,7 +56,7 @@ public:
      * 
      * @return All the nodes that matches the key.
      */
-    virtual ObjectList<war::wfde::Server> 
+    virtual ObjectList
     FindServer(const std::string& key = "") = 0;
     
     /*! Search for the key.
@@ -46,7 +65,7 @@ public:
      * 
      * @return All the nodes that matches the key.
      */
-    virtual ObjectList<war::wfde::Host> 
+    virtual ObjectList
     FindHost(const war::wfde::Server& parent, const std::string& key = "") = 0;
     
     /*! Search for the key.
@@ -56,7 +75,7 @@ public:
      * 
      * @return All the nodes that matches the key.
      */
-    virtual ObjectList<war::wfde::Protocol> 
+    virtual ObjectList
     FindProtocol(const war::wfde::Host& parent, const std::string& key = "") = 0;
     
     /*! Search for the key.
@@ -66,17 +85,9 @@ public:
      * 
      * @return All the nodes that matches the key.
      */
-    virtual ObjectList<war::wfde::Interface> 
+    virtual ObjectList
     FindInterface(const war::wfde::Protocol& parent, const std::string& key = "") = 0;
     
-    /*! Load all nodes relevant to the supplied entity. 
-     * 
-     * @param parent. Load all nodes relevant to this entity. If the value is nullptr,
-     *      the entire node-tree, staring with the Server(s) are returned.
-     */
-    
-    virtual ObjectList<war::wfde::Entity> 
-    LoadAll(const war::wfde::Entity *parent = nullptr) = 0;
     
     /*! Bootstrap the database
      * 

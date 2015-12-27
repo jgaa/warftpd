@@ -20,13 +20,15 @@ Tasks:
           implementation class for each database type (making/using a generic library 
           has a heavy toll, as I experienced while I was maintaining vmwares vcenter C++ 
           database library).
- - Create object database and add user authentication/permissions there
- - Add system tree to the object database
- - Add bootstrapping function for the database
+ v Create object database and add user authentication/permissions there
+ v Add system tree to the object database
+ v Add bootstrapping function for the database
+ - Implement db layer so that the FTP server can start, loading objects from the db.
  - Create unit tests 
  - Create functional tests.
+ - Design user authorization
  - Decide upon UI technology [QT, AngularJS, others??]
- - Set up feature specs and roadmap for alpha, beta and initial release
+ - Set up feature specs and road-map for alpha, beta and initial release
  
 
 Bugs:
@@ -35,3 +37,5 @@ Bugs:
 Stack:
 ===========================================================
 
+LoadAllEntities
+LoadHosts (needs auth manager)
