@@ -25,12 +25,18 @@ public:
     
     /*! Start shutdown of the service.
      * 
-     * The call will return immediatey 
+     * The call will return immediately 
      */
     virtual void Shutdown() = 0;
     
     /*! Returns when the shutdown is complete */
     virtual void WaitForServiceShutdown() = 0;
+    
+    /*! Load the permissions from wherever they are persisted */
+    virtual Permissions::ptr_t GetPermissions(const User& user) = 0;
+    
+    /*! Load the permissions from wherever they are persisted */
+    virtual Permissions::ptr_t GetPermissions(const Entity& entity) = 0;
     
     /*! Factory */
     static ptr_t Create(war::wfde::Configuration::ptr_t& conf);

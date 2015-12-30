@@ -9,3 +9,6 @@ Worklog:
                    Updated readme with correct install, compile and test instructions.
                    Completed skeleton daemon milestone.
                    Added doxygen configuration.
+
+2015-12-27 [jgaa]: Partially implementesd load from db (sqlite trough sqlpp11)
+		   Implemented user (login) authentication and Client cache

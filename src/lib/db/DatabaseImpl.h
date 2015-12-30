@@ -77,7 +77,7 @@ SQLPP_DECLARE_TABLE(
     (parent, varchar(38), SQLPP_NOT_NULL)
     (login_name, varchar(255), SQLPP_NOT_NULL)
     (full_name, varchar(255), SQLPP_NOT_NULL)
-    (auth_type,  int, SQLPP_NOT_NULL)
+    (auth_type, int, SQLPP_NOT_NULL)
     (passwd, varchar(255), SQLPP_NOT_NULL)
     (enabled, bool, SQLPP_NOT_NULL)
 )
@@ -121,7 +121,7 @@ public:
         
         UserData ud;
         
-        if (row->auth_type == static_cast<int>(AuthTypes::CLEAR_PASSWD)) {
+        if (row->auth_type == static_cast<long int>(AuthTypes::CLEAR_PASSWD)) {
             ud.auth_type = AuthTypes::CLEAR_PASSWD;
         } else {
             WAR_THROW_T(ExceptionOutOfRange, "Invalid auth_type");

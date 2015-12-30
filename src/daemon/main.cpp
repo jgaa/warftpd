@@ -11,7 +11,6 @@
 #ifdef WIN32
 #   include "win/minidump.h"
 #endif
-//#include <tasks/WarThreadpool.h>
 #include "warftpd/warftpd.h"
 #include "Daemon.h"
 
@@ -218,7 +217,7 @@ int main(int argc, char *argv[]) {
         LOG_ERROR_FN << "Caught boost exception: " << ex;
         return -1;
     } catch(const std::exception& ex) {
-        LOG_ERROR_FN << "Caught standad exception: " << ex;
+        LOG_ERROR_FN << "Caught standard exception: " << ex;
         return -1;
     } catch(...) {
         LOG_ERROR_FN << "*** Caught UNKNOWN exception!";

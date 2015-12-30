@@ -38,4 +38,4 @@ Stack:
 ===========================================================
 
 LoadAllEntities
-LoadHosts (needs auth manager)
+

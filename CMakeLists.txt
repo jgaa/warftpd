@@ -29,6 +29,10 @@ if (NOT DEFINED SQLPP_ROOT_DIR)
     set(SQLPP_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/sqlpp11)
 endif()
 
+if (NOT DEFINED DATELIB_ROOT_DIR)
+    set(DATELIB_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/date)
+endif()
+
 if (NOT DEFINED SQLPP_SQLITE_ROOT_DIR)
     set(SQLPP_SQLITE_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/sqlpp11-connector-sqlite3)
 endif()
@@ -78,6 +82,7 @@ include_directories(
     ${WFDE_ROOT_DIR}/include
     ${SQLPP_ROOT_DIR}/include
     ${SQLPP_SQLITE_ROOT_DIR}/include
+    ${DATELIB_ROOT_DIR}
     )
 
 add_subdirectory(${WARLIB_ROOT_DIR})

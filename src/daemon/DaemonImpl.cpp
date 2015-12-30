@@ -103,12 +103,11 @@ private:
                 
                 for(auto& pc : db_->FindProtocol(*host).conf) {
                     
-                    // TODO: Merge the interface definitions into the configuration
-                    //      or refactor prot->AddInterfaces() to deal with one interface
-                    //      definition at the time.
-                    
                     auto prot = CreateProtocol(host.get(), pc);
-                    prot->AddInterfaces();
+                    
+                    for(auto& inf : db_->FindInterface(*prot).conf) {
+                        prot->AddInterface(inf);
+                    }
                 }
             }
             
