@@ -64,6 +64,14 @@ public:
     ~DaemonImpl() {
     }
     
+    Permissions::ptr_t GetPermissions(const Client& user) override {
+        return nullptr;
+    }
+    
+    Permissions::ptr_t GetPermissions(const Entity& entity) override {
+        return nullptr;
+    }
+    
     void Start() override {
         thread_pool_ = std::make_unique<Threadpool>(
             boost::lexical_cast<int>(conf_->GetValue("/System/NumIoThreads", "0")),
