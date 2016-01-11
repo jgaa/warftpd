@@ -57,7 +57,6 @@ SQLPP_DECLARE_TABLE(
     ,
     (id,    varchar(38), SQLPP_NOT_NULL)
     (parent,varchar(38), SQLPP_NOT_NULL)
-    (type,  int, SQLPP_NOT_NULL)
 )
 
 SQLPP_DECLARE_TABLE(
@@ -222,6 +221,7 @@ public:
         const string server_id = get_uuid_as_string();
         const string host_id = get_uuid_as_string();
         const string ftp_id = get_uuid_as_string();
+        const string host_perm_id = get_uuid_as_string();
         
         {
             server::server svr;
@@ -239,6 +239,53 @@ public:
                 host.name = "FanClub",
                 host.long_name = WFDE_DEFAULT_HOST_LONG_NAME,
                 host.enabled = true));
+        }
+        
+        {
+            permission::permission permission;
+            GetDb()(insert_into(permission).set(
+                permission.id = host_perm_id,
+                permission.parent = host_id));
+        }
+        
+        {
+            path::path path;
+            auto cwd = boost::filesystem::current_path();
+            auto root_path = cwd;
+            root_path /= "ftproot";
+            GetDb()(insert_into(path).set(
+                path.id = get_uuid_as_string(),
+                path.permission_id = host_perm_id,
+                path.vpath = "/",
+                path.ppath = root_path.string(),
+                path.permissions = war::wfde::Path::GetDefaultPermissions()));
+            
+            auto pub_path = root_path;
+            pub_path /= "pub";
+            GetDb()(insert_into(path).set(
+                path.id = get_uuid_as_string(),
+                path.permission_id = host_perm_id,
+                path.vpath = "/pub",
+                path.ppath = pub_path.string(),
+                path.permissions = war::wfde::Path::GetDefaultPermissions()));
+            
+            auto home_path = root_path;
+            home_path /= "home";
+            GetDb()(insert_into(path).set(
+                path.id = get_uuid_as_string(),
+                path.permission_id = host_perm_id,
+                path.vpath = "/home",
+                path.ppath = home_path.string(),
+                path.permissions = 0));
+            
+            auto upload_path = root_path;
+            upload_path /= "upload";
+            GetDb()(insert_into(path).set(
+                path.id = get_uuid_as_string(),
+                path.permission_id = host_perm_id,
+                path.vpath = "/upload",
+                path.ppath = upload_path.string(),
+                path.permissions = war::wfde::Path::GetDefaultPubUploadPermissions()));
         }
         
         {

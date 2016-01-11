@@ -38,7 +38,6 @@ CREATE TABLE "interface" (
 
 CREATE TABLE "permission" (
     "id"   VARCHAR(38) NOT NULL PRIMARY KEY,
-    "type" INTEGER NOT NULL,
     "parent" VARCHAR(38) NOT NULL
 );
 
