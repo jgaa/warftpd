@@ -1,0 +1,10 @@
+.kdev4
+dbuild
+sbuild
+doc
+*/*.rej
+include/warftpd/warftpd_config.h
+lib
+warftpd.db
+warftpd.kdev4
+
