@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 #include "warftpd/warftpd.h"
 #include "warftpd/Database.h"
 #include "log/WarLog.h"
@@ -208,6 +209,62 @@ public:
         return rval;
     }
     
+    war::wfde::Configuration::ptr_t
+    GetPermissions(const boost::uuids::uuid& uuid) {
+        const auto key = boost::uuids::to_string(uuid);
+        
+        permission::permission perm;
+        path::path path;
+        
+//         auto result = GetDb()(select(perm.id).from(perm)
+//             .where(perm.parent.like(key)));
+//         
+//         auto perms_row = result.begin();
+//         if (perms_row == result.end()) {
+//             return nullptr;
+//         }
+//     
+//         auto conf = Configuration::CreateInstance();
+//         
+//         for (const auto& row : GetDb()(select(path.vpath, path.ppath, path.permissions)
+//             .from(path).where(path.permission_id.like(perms_row->id)))) { //path.perm_id.like(perm.id)
+//             ;
+//         }
+//         
+//         return conf;
+        
+        war::wfde::Configuration::ptr_t conf;
+        
+        const auto path_root = "/Paths/";
+        for (const auto& row : GetDb()(select(path.vpath, path.ppath, path.permissions)
+            .from(perm.join(path).on(perm.id == path.permission_id))
+            .where(perm.parent.like(key)))) {
+         
+            // Lazy initialization. A lot of objects does not have any properties
+            if (!conf) {
+                conf =  Configuration::CreateInstance();
+            }
+            
+            const auto path_node = path_root + string(row.vpath) + "/";
+            
+            conf->SetValue(string(path_node + "Name").c_str(), row.vpath);
+            conf->SetValue(string(path_node + "Path").c_str(), row.ppath);
+            conf->SetValue(string(path_node + "Perms").c_str(), 
+                           war::wfde::Path::ToPermNames(row.permissions));
+        }
+        
+        return conf;
+    }
+    
+    war::wfde::Configuration::ptr_t
+    GetPermissions(const war::wfde::Client& client) override {
+        return GetPermissions(client.GetUuid());
+    }
+    
+    war::wfde::Configuration::ptr_t
+    GetPermissions(const war::wfde::Entity& node) override {
+        return GetPermissions(node.GetId());
+    }
     
     void Bootstrap() override {
         // Read the create table script

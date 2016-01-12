@@ -24,12 +24,7 @@ public:
     Database(Database&&) = delete;
     Database& operator = (const Database&) = delete;
     Database& operator = (Database&&) = delete;
-    
-//     war::wfde::Server::ptr_t GetServer(const id_t& id);
-//     war::wfde::Host::ptr_t GetHost(const id_t& id);
-//     war::wfde::Protocol::ptr_t GetProtocol(const id_t& id);
-//     war::wfde::Interface::ptr_t GetInterface(const id_t& id);
-    
+        
     struct UserData {
         std::string login_name;
         AuthTypes auth_type;
@@ -88,6 +83,25 @@ public:
     virtual ObjectList
     FindInterface(const war::wfde::Protocol& parent, const std::string& key = "") = 0;
     
+    /*! Get the permissions for an object.
+     * 
+     * The permissions are the ones defined for this object. They are
+     * returned as is, without being merged into effective permissions.
+     * 
+     * @returns Pointer to Configuration data or nullpointer
+     */
+    virtual war::wfde::Configuration::ptr_t
+    GetPermissions(const war::wfde::Entity& node) = 0;
+    
+    /*! Get the permissions for a user
+     * 
+     * The permissions are the ones defined for this object. They are
+     * returned as is, without being merged into effective permissions.
+     * 
+     * @returns Pointer to Configuration data or nullpointer
+     */
+    virtual war::wfde::Configuration::ptr_t
+    GetPermissions(const war::wfde::Client& client) = 0;
     
     /*! Bootstrap the database
      * 
