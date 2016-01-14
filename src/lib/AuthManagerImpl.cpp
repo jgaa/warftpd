@@ -57,8 +57,10 @@ public:
     public:
         using on_zero_callback_t = function<void ()>;
         
-        ClientImpl(Database::UserData&& data, const on_zero_callback_t& onZeroCallback) 
-        : user_data_(move(data)), on_zero_callback_{onZeroCallback}
+        ClientImpl(AuthManagerImpl& mgr, 
+                   Database::UserData&& data, 
+                   const on_zero_callback_t& onZeroCallback) 
+        : auth_manager_{mgr}, user_data_(move(data)), on_zero_callback_{onZeroCallback}
         {
             LOG_TRACE2_FN << "User " << log::Esc(user_data_.login_name) << " "
             << user_data_.id << " is instantiated";
@@ -69,13 +71,23 @@ public:
                 << boost::uuids::to_string(user_data_.id) << " is deleted (from memory).";
         }
         
-        const std::string& GetLoginName() const override { return user_data_.login_name; }
+        const string& GetLoginName() const override { return user_data_.login_name; }
         const boost::uuids::uuid& GetUuid() const override { return user_data_.id; }
         int GetNumInstances() const override { return instance_count_; }
         const Database::UserData& GetData() const noexcept { return user_data_; }
         
-        // TODO: Implement delayed loading of properties
-        Permissions::ptr_t GetPermissions() const override {return nullptr;}
+        Permissions::ptr_t GetPermissions() const override {
+            //TODO: Implement refresh after n seconds
+            
+            unique_lock<mutex> lock(auth_lock_);
+            if (perms_)
+                return perms_;
+            
+            // Lazy loading of permissions from the database.
+            auto defs = auth_manager_.GetDb().GetPermissions(*this);
+            const_cast<Permissions::ptr_t&>(perms_) = CreatePermissions(defs);
+            return perms_;
+        }
         void IncInstanceCounter() { ++instance_count_; }
         void DecInstanceCounter() { 
             if (--instance_count_ == 0) {
@@ -86,9 +98,12 @@ public:
         }
         
     private:
+        AuthManagerImpl& auth_manager_;
         const Database::UserData user_data_;
-        std::atomic_int instance_count_;
+        Permissions::ptr_t perms_;
+        atomic_int instance_count_;
         on_zero_callback_t on_zero_callback_;
+        mutable mutex auth_lock_;
     };
     
     // Wrapper needed to maintain the instance count for the client
@@ -163,6 +178,8 @@ public:
         host_ = move(host);
     }
     
+    Database& GetDb() { return *db_; }
+    
 private:
     Client::ptr_t Authenticated(Client::ptr_t&& client) {
         // TODO: Add login-count
@@ -184,7 +201,7 @@ private:
         
         // Load the client from the database
         auto user_data = db_->FindUser(host_->GetId(), loginName);
-        client = make_shared<ClientImpl>(move(user_data), [this, client]() {
+        client = make_shared<ClientImpl>(*this, move(user_data), [this, client]() {
                 LOG_TRACE3_FN << "Scheduling client " << client->GetUuid()
                     << " for removal from the client-cache.";
                     
