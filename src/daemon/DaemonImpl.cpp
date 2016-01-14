@@ -94,6 +94,14 @@ public:
     }
 
 private:
+    void SetPermissions(Entity& entity) {
+        auto defs = db_->GetPermissions(entity);
+        if (defs) {
+            auto perms = CreatePermissions(defs);
+            entity.SetPermissions(perms);
+        }
+    }
+    
     void LoadAllEntities() {
         for(auto& sc : db_->FindServer().conf) {
             if (!boost::lexical_cast<bool>(sc->GetValue("/Enabled", "1")))
@@ -101,17 +109,20 @@ private:
             
             // Instantiate the server
             auto server = CreateServer(sc, *thread_pool_);
+            SetPermissions(*server);
             
             // Load hosts
             for(auto& hc : db_->FindHost(*server).conf) {
                 auto am = CreateAuthManager(db_);
                 auto host = CreateHost(*server, am, hc);
+                SetPermissions(*host);
                 
                 // TODO: Add permissions
                 
                 for(auto& pc : db_->FindProtocol(*host).conf) {
                     
                     auto prot = CreateProtocol(host.get(), pc);
+                    SetPermissions(*prot);
                     
                     for(auto& inf : db_->FindInterface(*prot).conf) {
                         prot->AddInterface(inf);

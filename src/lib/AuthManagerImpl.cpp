@@ -85,7 +85,9 @@ public:
             
             // Lazy loading of permissions from the database.
             auto defs = auth_manager_.GetDb().GetPermissions(*this);
-            const_cast<Permissions::ptr_t&>(perms_) = CreatePermissions(defs);
+            if (defs) {
+                const_cast<Permissions::ptr_t&>(perms_) = CreatePermissions(defs);
+            }
             return perms_;
         }
         void IncInstanceCounter() { ++instance_count_; }
