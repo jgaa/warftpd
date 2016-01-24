@@ -6,6 +6,7 @@
  */
 
 #include <boost/program_options.hpp>
+#include <boost/optional.hpp>
 #include <log/WarLog.h>
 #include "war_error_handling.h"
 #ifdef WIN32
