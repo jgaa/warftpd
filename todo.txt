@@ -23,10 +23,10 @@ Tasks:
  v Create object database and add user authentication/permissions there
  v Add system tree to the object database
  v Add bootstrapping function for the database
- - Implement db layer so that the FTP server can start, loading objects from the db.
+ ~ Implement db layer so that the FTP server can start, loading objects from the db.
  - Create unit tests 
  - Create functional tests.
- - Design user authorization
+ v Design user authorization
  - Decide upon UI technology [QT, AngularJS, others??]
  - Set up feature specs and road-map for alpha, beta and initial release
  

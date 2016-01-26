@@ -59,6 +59,7 @@ public:
         
         // TODO: Add syslog/eventlog handler
         
+        RegisterDefaultProtocols();   
     }
     
     ~DaemonImpl() {
@@ -103,17 +104,22 @@ private:
     }
     
     void LoadAllEntities() {
+	LOG_DEBUG_FN << "Begin loading entities:";
         for(auto& sc : db_->FindServer().conf) {
             if (!boost::lexical_cast<bool>(sc->GetValue("/Enabled", "1")))
                 continue;
             
             // Instantiate the server
+	    LOG_DEBUG_FN << "  -->> Server: " << sc->GetValue("/Name");
             auto server = CreateServer(sc, *thread_pool_);
             SetPermissions(*server);
             
             // Load hosts
             for(auto& hc : db_->FindHost(*server).conf) {
-                auto am = CreateAuthManager(db_);
+              
+	      LOG_DEBUG_FN << "  ---->> Host: " << hc->GetValue("/Name");
+	      
+	      auto am = CreateAuthManager(db_);
                 auto host = CreateHost(*server, am, hc);
                 SetPermissions(*host);
                 
@@ -121,10 +127,12 @@ private:
                 
                 for(auto& pc : db_->FindProtocol(*host).conf) {
                     
+		    LOG_DEBUG_FN << "  ------>> Protocol: " << pc->GetValue("/Name");
                     auto prot = CreateProtocol(host.get(), pc);
                     SetPermissions(*prot);
                     
                     for(auto& inf : db_->FindInterface(*prot).conf) {
+			LOG_DEBUG_FN << "  -------->> Interface: " << inf->GetValue("/Name");
                         prot->AddInterface(inf);
                     }
                 }

@@ -53,6 +53,11 @@ How to get the code and compile it for Linux:
    $ make
    
 
+Syncronizing the submodules with the latest upstream versions
+-------------------------------------------------------------------
+  $ git submodule foreach git checkout master
+  $ git submodule foreach git pull origin master
+
    
 Functional Testing:
 -------------------------------------------------------------------
