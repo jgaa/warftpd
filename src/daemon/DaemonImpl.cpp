@@ -28,7 +28,7 @@ std::ostream& operator << (std::ostream& o, const warftpd::Version& ver)
 
 
 namespace warftpd {
-       
+
 namespace impl {
 
 class DaemonImpl : public Daemon
@@ -45,7 +45,7 @@ public:
             logger.AddHandler(make_shared<log::LogToStream>(cout, "console",
                 log::LogEngine::GetLevelFromName(level)));
         }
-        
+
         if (conf->HaveValue("/Log/File")) {
             string path = conf->GetValue("/Log/File");
             string level = conf->GetValue("/Log/Level", "NOTICE");
@@ -56,25 +56,25 @@ public:
                 "file",
                 log::LogEngine::GetLevelFromName(level)));
         }
-        
+
         // TODO: Add syslog/eventlog handler
-        
-        RegisterDefaultProtocols();   
+
+        RegisterDefaultProtocols();
     }
-    
+
     ~DaemonImpl() {
     }
-    
+
     Permissions::ptr_t GetPermissions(const Client& user) override {
         return nullptr;
     }
-    
+
     Permissions::ptr_t GetPermissions(const Entity& entity) override {
         return nullptr;
     }
-    
+
     void Start() override {
-        thread_pool_ = std::make_unique<Threadpool>(
+        thread_pool_ = make_unique<Threadpool>(
             boost::lexical_cast<int>(conf_->GetValue("/System/NumIoThreads", "0")),
             boost::lexical_cast<int>(conf_->GetValue("/System/MaxIoThreadQueueCapacity", "1024")));
         db_ = Database::CreateInstance(*conf_);
@@ -82,14 +82,14 @@ public:
             LOG_NOTICE_FN << "Bootstrapping the database. Any existing data will be deleted.";
             db_->Bootstrap();
         }
-        
+
         LoadAllEntities();
     }
-    
+
     void Shutdown() override {
         thread_pool_->Close();
     }
-    
+
     void WaitForServiceShutdown() override {
         thread_pool_->WaitUntilClosed();
     }
@@ -102,52 +102,50 @@ private:
             entity.SetPermissions(perms);
         }
     }
-    
+
     void LoadAllEntities() {
-	LOG_DEBUG_FN << "Begin loading entities:";
+        LOG_DEBUG_FN << "Begin loading entities:";
         for(auto& sc : db_->FindServer().conf) {
             if (!boost::lexical_cast<bool>(sc->GetValue("/Enabled", "1")))
                 continue;
-            
+
             // Instantiate the server
-	    LOG_DEBUG_FN << "  -->> Server: " << sc->GetValue("/Name");
+            LOG_DEBUG_FN << "  -->> Server: " << sc->GetValue("/Name");
             auto server = CreateServer(sc, *thread_pool_);
             SetPermissions(*server);
-            
+
             // Load hosts
             for(auto& hc : db_->FindHost(*server).conf) {
-              
-	      LOG_DEBUG_FN << "  ---->> Host: " << hc->GetValue("/Name");
-	      
-	      auto am = CreateAuthManager(db_);
+
+                LOG_DEBUG_FN << "  ---->> Host: " << hc->GetValue("/Name");
+
+                auto am = CreateAuthManager(db_);
                 auto host = CreateHost(*server, am, hc);
                 SetPermissions(*host);
-                
-                // TODO: Add permissions
-                
+
                 for(auto& pc : db_->FindProtocol(*host).conf) {
-                    
-		    LOG_DEBUG_FN << "  ------>> Protocol: " << pc->GetValue("/Name");
+
+                    LOG_DEBUG_FN << "  ------>> Protocol: " << pc->GetValue("/Name");
                     auto prot = CreateProtocol(host.get(), pc);
                     SetPermissions(*prot);
-                    
+
                     for(auto& inf : db_->FindInterface(*prot).conf) {
-			LOG_DEBUG_FN << "  -------->> Interface: " << inf->GetValue("/Name");
+                        LOG_DEBUG_FN << "  -------->> Interface: " << inf->GetValue("/Name");
                         prot->AddInterface(inf);
                     }
                 }
             }
-            
+
             servers_.push_back(move(server));
         }
     }
-    
+
     Database::ptr_t db_;
     std::unique_ptr<Threadpool> thread_pool_;
     Configuration::ptr_t conf_;
     vector<Server::ptr_t> servers_;
 };
-    
+
 } // impl
 
 Daemon::ptr_t Daemon::Create(Configuration::ptr_t& conf) {
