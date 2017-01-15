@@ -3,8 +3,6 @@
 cmake_minimum_required(VERSION 3.0)
 project (warftpd)
 
-enable_testing()
-
 if (NOT DEFINED WITH_APIDOC)
 	option(WITH_APIDOC "Generate Doxygen documentation")
 endif()
@@ -17,12 +15,12 @@ if (NOT DEFINED WARFTPD_ROOT_DIR)
     set(WARFTPD_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
-if (NOT DEFINED WARLIB_ROOT_DIR)
-    set(WARLIB_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/warlib)
-endif()
-
 if (NOT DEFINED WFDE_ROOT_DIR)
     set(WFDE_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/wfde)
+endif()
+
+if (NOT DEFINED WARLIB_ROOT_DIR)
+    set(WARLIB_ROOT_DIR  ${WFDE_ROOT_DIR}/externals/warlib)
 endif()
 
 if (NOT DEFINED SQLPP_ROOT_DIR)
@@ -40,6 +38,7 @@ endif()
 # Tell warlib's cmake setup that it's embedded into a higher level project
 set(EMBEDDED_WARLIB ON)
 set(EMBEDDED_WFDELIB ON)
+set(WFDE_WITH_TLS ON)
 
 find_package(OpenSSL REQUIRED)
 
