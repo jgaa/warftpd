@@ -1,8 +1,8 @@
 /* This project is free software, released under the Gnu General Public License v3
  * See the file LICENSE for details.
- * 
+ *
  * This file contains the main function for the War FTP Daemon.
- * 
+ *
  */
 
 #include <boost/program_options.hpp>
@@ -27,7 +27,7 @@ struct CmdLineOptions
     boost::optional<bool> daemon;
 #endif
     string conf_file {WARFTPD_CONFIG_FILE_NAME};
-    
+
     boost::optional<bool> truncate_log;;
     boost::optional<string> console_log_level;
     boost::optional<string> log_level;
@@ -68,10 +68,10 @@ bool ParseCommandLine(int argc, char *argv[], log::LogEngine& logger,
             "Configuration file")
         ("console-log,C", po::value<string>(),
             "Log-level for the console-log")
-        ("log-level,L", 
+        ("log-level,L",
             po::value<string>(),
             "Log-level for the log-file")
-        ("log-file", 
+        ("log-file",
             po::value<string>(),
             "Name of the log-file")
         ("truncate-log",
@@ -110,7 +110,7 @@ bool ParseCommandLine(int argc, char *argv[], log::LogEngine& logger,
 
     if (
 #ifndef WIN32
-        !conf.daemon && 
+        !conf.daemon &&
 #endif
         vm.count("console-log")
     ) {
@@ -145,48 +145,51 @@ bool ParseCommandLine(int argc, char *argv[], log::LogEngine& logger,
 
 int main(int argc, char *argv[]) {
     log::LogEngine logger;
-    
+    bool command_mode = false;
+
 #ifdef WIN32
     /*
      * Enable minidump generation if the application crash under Windows
      */
     EnableMinidump(WARFTPD_PROGRAM_NAME);
 #endif
-    
+
     try {
-        
+
         Configuration::ptr_t conf;
         {
-           /* 
-            * Create a configuration 
+           /*
+            * Create a configuration
             */
             CmdLineOptions options;
-                        
+
             if (!ParseCommandLine(argc, argv, logger, options))
                 return -1;
-            
+
             if (!boost::filesystem::exists(options.conf_file)) {
-                cerr << "The configuration-file \""  << options.conf_file
-                    << "\" was not found." << endl;
-                    return -1;
+                LOG_WARN << "The configuration-file \""
+                    << options.conf_file
+                    << "\" was not found.";
+                conf = war::wfde::Configuration::CreateInstance();
+            } else {
+                conf = war::wfde::Configuration::GetConfiguration(options.conf_file);
             }
-            
-            conf = war::wfde::Configuration::GetConfiguration(options.conf_file);
             WAR_ASSERT(conf != nullptr);
-            
+
             // Override the options with those from the command-line.
             APPLY_IF(options.truncate_log, "/Log/Truncate");
             APPLY_IF(options.console_log_level, "/Log/ConsoleLevel");
             APPLY_IF(options.log_level, "/Log/Level");
             APPLY_IF(options.log_file, "/Log/File");
-            
+
             APPLY_IF(options.num_io_threads, "/System/NumIoThreads");
             APPLY_IF(options.max_io_thread_queue_capacity, "/System/MaxIoThreadQueueCapacity");
             APPLY_IF(options.daemon, "/System/Daemon");
             if (options.bootstrap && *options.bootstrap) {
                 conf->SetValue("/Database/Bootstrap", "1");
+                command_mode = true;
             }
-            
+
     #ifndef WIN32
             if (boost::lexical_cast<bool>(conf->GetValue("/System/Daemon", "0"))) {
                 LOG_INFO << "Switching to system daemon mode";
@@ -196,9 +199,9 @@ int main(int argc, char *argv[]) {
         }
 
         auto daemon = warftpd::Daemon::Create(conf);
-        
+
         LOG_INFO << WARFTPD_PROGRAM_NAME << ' ' << warftpd::Version() << " starting up...";
-        
+
         daemon->Start();
 
         /* We now put the main-thread to sleep.
@@ -206,11 +209,13 @@ int main(int argc, char *argv[]) {
          * It will remain sleeping until we receive one of the common
          * shutdown/quit siglals.
          */
-        SleepUntilDoomdsay();
+        if (!command_mode) {
+            SleepUntilDoomdsay();
+        }
 
         daemon->Shutdown();
         daemon->WaitForServiceShutdown();
-        
+
     } catch(const war::ExceptionBase& ex) {
         LOG_ERROR_FN << "Caught exception: " << ex;
         return -1;
@@ -227,6 +232,6 @@ int main(int argc, char *argv[]) {
 
     LOG_INFO << "So Long, and Thanks for All the Fish!";
 
-    
+
     return 0; // Everything is fine
 }
