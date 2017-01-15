@@ -11,16 +11,20 @@ if (NOT DEFINED WITH_UNITTESTS)
     option(WITH_UNITTESTS "Enable unittests" ON)
 endif()
 
+if (NOT DEFINED WARFTPD_WITH_TLS)
+    option(WARFTPD_WITH_TLS "Enable TLS" ON)
+endif()
+
 if (NOT DEFINED WARFTPD_ROOT_DIR)
     set(WARFTPD_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
-if (NOT DEFINED WFDE_ROOT_DIR)
-    set(WFDE_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/wfde)
+if (NOT DEFINED WARLIB_ROOT_DIR)
+    set(WARLIB_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/warlib)
 endif()
 
-if (NOT DEFINED WARLIB_ROOT_DIR)
-    set(WARLIB_ROOT_DIR  ${WFDE_ROOT_DIR}/externals/warlib)
+if (NOT DEFINED WFDE_ROOT_DIR)
+    set(WFDE_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/wfde)
 endif()
 
 if (NOT DEFINED SQLPP_ROOT_DIR)
@@ -38,15 +42,24 @@ endif()
 # Tell warlib's cmake setup that it's embedded into a higher level project
 set(EMBEDDED_WARLIB ON)
 set(EMBEDDED_WFDELIB ON)
-set(WFDE_WITH_TLS ON)
 
-find_package(OpenSSL REQUIRED)
+if (WARFTPD_WITH_TLS)
+    set(WFDE_WITH_TLS ON)
+    find_package(OpenSSL REQUIRED)
+endif()
+
+if (UNIX)
+    set(THREADLIBS pthread)
+endif()
 
 message(STATUS "WARLIB_ROOT_DIR: ${WARLIB_ROOT_DIR}")
 include(${WARLIB_ROOT_DIR}/cmake_scripts/boost.cmake)
 include(${WARLIB_ROOT_DIR}/cmake_scripts/pch.cmake)
 
 set(DEFAULT_LIBRARIES ${DEFAULT_LIBRARIES}
+    ${DEFAULT_LIBRARIES}
+    ${THREADLIBS}
+    ${OPENSSL_LIBRARIES}
     war_tasks
     war_log
     war_base
@@ -88,6 +101,7 @@ add_subdirectory(${WARLIB_ROOT_DIR})
 add_subdirectory(${WFDE_ROOT_DIR})
 add_subdirectory(src)
 add_subdirectory(externals)
+
 
 if (WITH_APIDOC)
     find_package(Doxygen)

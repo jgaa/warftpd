@@ -10,3 +10,6 @@
 [submodule "externals/date"]
 	path = externals/date
 	url = https://github.com/HowardHinnant/date.git
+[submodule "externals/warlib"]
+	path = externals/warlib
+	url = git://git.code.sf.net/p/warlib/warlib
