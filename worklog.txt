@@ -1,9 +1,9 @@
 Worklog:
 
 2015-12-20 [jgaa]: Created the project
-                   Integrated warlib and wfde as git submodules. 
+                   Integrated warlib and wfde as git submodules.
                    Set up cmake to compile everything with clang++3.5
-                   
+
 2015-12-21 [jgaa]: Compiled with g++ 4.9.2
                    Ran all unit and functional tests.
                    Updated readme with correct install, compile and test instructions.
@@ -12,3 +12,5 @@ Worklog:
 
 2015-12-27 [jgaa]: Partially implementesd load from db (sqlite trough sqlpp11)
 		   Implemented user (login) authentication and Client cache
+
+2017-01-14 [jgaa]: Started to work on the project again.

@@ -2,39 +2,30 @@ War FTP Daemon TODO
 
 Tasks:
 ===========================================================
- v Create the repository
- v Import warlib
- v Import wfde
- v Make sure all the unit tests and functional tests can be executed.
- v Create initial, skeleton daemon.
- v Configure doxygen
- v Choose database library and import it [need sqlite and postgresql]
-    Try to use sqlpp in a interface/impl model, so I can easily add support
-    for unsupported databases.
-        o sqlpp is an alternative, but do not yet work under windows (MSVC is not C++14 
-          compliant). However, M$ has announced that clang will be available as a front
-          end to their compiler, so hopefully it will be by the time I prepare a Windows
-          version.
-          Also, I don't know if it support tree structure queries.
-        o Since the database use in warftpd is rather simple, I can maintain one 
-          implementation class for each database type (making/using a generic library 
-          has a heavy toll, as I experienced while I was maintaining vmwares vcenter C++ 
-          database library).
- v Create object database and add user authentication/permissions there
- v Add system tree to the object database
- v Add bootstrapping function for the database
+ - Document config file settings
+
  ~ Implement db layer so that the FTP server can start, loading objects from the db.
- - Create unit tests 
- - Create functional tests.
- v Design user authorization
+
+ - Add unit test framework as git submodule
+
+ - Create functional tests
+
  - Decide upon UI technology [QT, AngularJS, others??]
+
  - Set up feature specs and road-map for alpha, beta and initial release
- 
+
+ - [wfde] Implement virtual hosts trough TLS hostnames (Require a new, layered
+    IO model, where we can add HTTP (tls, chunked, plain, gzip) and FTP (tls)
+    features for re-use. Tls must be implemented manually (in stead of relying
+    on asio/openssl) - but this allows us to use gnu tls, Windows encryption,
+    libressl or whatever we want).
+
+ - [warlib] Channel logging  of warnings and errors to the console when the
+    log is unconfigured.
 
 Bugs:
 ===========================================================
 Stack:
 ===========================================================
 
-LoadAllEntities
 
