@@ -3,6 +3,8 @@
 
 This is a new implementation of the War FTP Daemon.
 
+2017-10-18: Status: *The build is currently broken*. Should be fixed within a week.
+
 War FTP Daemon consists of three libraries written by Jarle (jgaa) Aase.
 
     warftpd (GPLv3)
@@ -33,30 +35,6 @@ Other dependencies:
   - OpenSSL (or a plug-in compatible library)
   - boost
   - zlib
-
-Required tools:
-  - g++ version 5.9 or better or clang++ version 3.5 or better
-  - cmake
-  - doxygen
-
-
-
-## Obtaining and compiling the code:
-
-How to get the code and compile it for Linux:
-
-   $ git clone git://git.code.sf.net/p/wfde/warftpd/git warftpd
-   $ cd warftpd
-   $ git submodule update --init
-   $ mkdir dbuild
-   $ cd dbuild
-   $ cmake -DCMAKE_BUILD_TYPE=Debug -G "Unix Makefiles" ../
-   $ make
-
-
-## Syncronizing the submodules with the latest upstream versions
-  $ git submodule foreach git checkout master
-  $ git submodule foreach git pull origin master
 
 
 ## Functional Testing:
