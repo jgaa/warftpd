@@ -1,6 +1,6 @@
 [submodule "externals/wfde"]
 	path = externals/wfde
-	url = ssh://jgaa@git.code.sf.net/p/wfde/wfde
+	url = https://github.com/jgaa/wfde.git
 [submodule "externals/sqlpp11"]
 	path = externals/sqlpp11
 	url = https://github.com/rbock/sqlpp11.git
@@ -12,4 +12,4 @@
 	url = https://github.com/HowardHinnant/date.git
 [submodule "externals/warlib"]
 	path = externals/warlib
-	url = git://git.code.sf.net/p/warlib/warlib
+	url = https://github.com/jgaa/warlib.git
