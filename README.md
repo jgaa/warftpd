@@ -10,12 +10,12 @@ War FTP Daemon consists of three libraries written by Jarle (jgaa) Aase.
             [depends on] warlib (LGPLv3)
 
 
-Warlib is a rather general C++ library that implements trivial, reusable things like
+[Warlib](https://github.com/jgaa/warlib) is a rather general C++ library that implements trivial, reusable things like
 logging, a thread-pool and some helper classes around some common boost libraries.
 Warlib depends on boost::asio for IO and threads. It uses the C++14 library whenever
 possible, and falls back to boost when needed.
 
-Wfde is a complete implementation of the relevant parts of the FTP protocol.
+[Wfde](https://github.com/jgaa/wfde) is a complete implementation of the relevant parts of the FTP protocol.
 It also implements HTTP so that a file sharing site can use one common configuration
 for both FTP and HTTP. The HTTP classes is used by warftpd also for the user
 interface, and it may be used in the future to provide a REST interface to the server.
@@ -29,8 +29,18 @@ The warftpd library implements all that is unique for the War FTP Daemon. That m
 the actual user/object model, the User Interface infrastructure, and additional
 features that have made the War FTP Daemon popular for 20 years.
 
-Other dependencies:
-  - OpenSSL (or a plug-in compatible library)
-  - boost
+
+Externals installed and compiled by CMake:
+- warlib
+- wfde
+- lest - Unit test framework
+- Sqlpp11 - Generic Database library (currently sqlite is used)
+- HinnatDate - Date library used by Sqlpp11
+
+Other dependencies (must be present on the development platform)
+- boost
+- OpenSSL
+- sqlite3
+
 
 *Status*: Under development
