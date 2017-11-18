@@ -1,131 +1,60 @@
-# Main project definition for warftpd
-
 cmake_minimum_required(VERSION 3.0)
-project (warftpd)
+project (warftpd_project VERSION 4.0 LANGUAGES CXX)
 
-if (NOT DEFINED WITH_APIDOC)
-	option(WITH_APIDOC "Generate Doxygen documentation")
-endif()
-
-if (NOT DEFINED WITH_UNITTESTS)
-    option(WITH_UNITTESTS "Enable unittests" ON)
-endif()
+set (WARFTPD_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 if (NOT DEFINED WARFTPD_WITH_TLS)
     option(WARFTPD_WITH_TLS "Enable TLS" ON)
 endif()
 
-if (NOT DEFINED WARFTPD_ROOT_DIR)
-    set(WARFTPD_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+if (NOT DEFINED WITH_APIDOC)
+    option(WITH_APIDOC "Generate Doxygen documentation")
 endif()
 
-if (NOT DEFINED WARLIB_ROOT_DIR)
-    set(WARLIB_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/warlib)
-endif()
+set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH}  ${CMAKE_CURRENT_SOURCE_DIR}/cmake_scripts)
 
-if (NOT DEFINED WFDE_ROOT_DIR)
-    set(WFDE_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/wfde)
-endif()
 
-if (NOT DEFINED SQLPP_ROOT_DIR)
-    set(SQLPP_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/sqlpp11)
-endif()
-
-if (NOT DEFINED DATELIB_ROOT_DIR)
-    set(DATELIB_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/date)
-endif()
-
-if (NOT DEFINED SQLPP_SQLITE_ROOT_DIR)
-    set(SQLPP_SQLITE_ROOT_DIR ${WARFTPD_ROOT_DIR}/externals/sqlpp11-connector-sqlite3)
-endif()
-
-# Tell warlib's cmake setup that it's embedded into a higher level project
-set(EMBEDDED_WARLIB ON)
-set(EMBEDDED_WFDELIB ON)
-
-if (WARFTPD_WITH_TLS)
-    set(WFDE_WITH_TLS ON)
-    find_package(OpenSSL REQUIRED)
-endif()
-
-if (UNIX)
-    set(THREADLIBS pthread)
-endif()
-
-message(STATUS "WARLIB_ROOT_DIR: ${WARLIB_ROOT_DIR}")
-include(${WARLIB_ROOT_DIR}/cmake_scripts/boost.cmake)
-include(${WARLIB_ROOT_DIR}/cmake_scripts/pch.cmake)
-
-set(DEFAULT_LIBRARIES ${DEFAULT_LIBRARIES}
-    ${DEFAULT_LIBRARIES}
-    ${THREADLIBS}
-    ${OPENSSL_LIBRARIES}
-    war_tasks
-    war_log
-    war_base
-    )
-
-# We create a configuration file so that other code that
-# include our header files gets the correct configuration.
-set(CONF_PATH ${PROJECT_SOURCE_DIR}/include/warftpd/warftpd_config.h)
+# if (NOT DEFINED WARFTPD_WITH_UNIT_TESTS)
+#     option(WARFTPD_WITH_UNIT_TESTS "Enable Unit Testing" ON)
+#     if (NOT DEFINED WARFTPD_AUTORUN_UNIT_TESTS)
+#         option(WARFTPD_AUTORUN_UNIT_TESTS "Run unit tests during build" OFF)
+#     endif()
+#     include(cmake_scripts/add_and_run_test.cmake)
+# endif()
 
 message(STATUS "Using ${CMAKE_CXX_COMPILER}")
 
-if (UNIX)
-  # For now, assume we use g++/clang++
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1 -o3 ")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG=1 -D_DEBUG=1 -o0 -g ")
-    add_definitions(-D__USE_LARGEFILE64=1 -D__USE_FILE_OFFSET64=1 -Wall -fPIC -std=c++1y -pthread)
-else()
-    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -DNDEBUG=1 ")
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DDEBUG=1 -D_DEBUG=1 ")
-    # We will support windows from Windows Vista
-    add_definitions(-D_WIN32_WINNT=0x0600)
-endif()
+include(cmake_scripts/external-projects.cmake)
 
-include_directories(${Boost_INCLUDE_DIRS})
+find_package(SQLite3 REQUIRED)
 
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib CACHE PATH "Destination location")
-link_directories(${LIBRARY_OUTPUT_PATH})
-
-include_directories(
-    ${PROJECT_SOURCE_DIR}/include
-    ${WARLIB_ROOT_DIR}/include
-    ${WFDE_ROOT_DIR}/include
-    ${SQLPP_ROOT_DIR}/include
-    ${SQLPP_SQLITE_ROOT_DIR}/include
-    ${DATELIB_ROOT_DIR}
+# Include Boost as an imported target
+find_package(Boost 1.50 REQUIRED COMPONENTS
+    system
+    program_options
+    filesystem
+    date_time
+    context
+    coroutine
+    chrono
+    regex
     )
 
-add_subdirectory(${WARLIB_ROOT_DIR})
-add_subdirectory(${WFDE_ROOT_DIR})
-add_subdirectory(src)
-add_subdirectory(externals)
+# add_library(boost INTERFACE IMPORTED)
+# set_property(TARGET boost PROPERTY
+#     INTERFACE_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
+#     )
 
-
-if (WITH_APIDOC)
-    find_package(Doxygen)
-    if (DOXYGEN_FOUND)
-
-        set(DOXYGEN_INPUT Doxygen)
-        set(DOXYGEN_OUTPUT doc/html)
-
-        add_custom_command(
-            OUTPUT ${DOXYGEN_OUTPUT}
-            COMMAND ${CMAKE_COMMAND} -E echo_append "Building API Documentation..."
-            COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_INPUT}
-            COMMAND ${CMAKE_COMMAND} -E echo "Done."
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            DEPENDS ${DOXYGEN_INPUT}
-        )
-
-        add_custom_target(vgtd_apidoc ALL DEPENDS ${DOXYGEN_OUTPUT})
-
-    endif (DOXYGEN_FOUND)
+if (WARFTPD_WITH_TLS)
+    find_package(OpenSSL REQUIRED)
 endif()
 
-message(STATUS "Writing the current vgtd configuration to ${CONF_PATH}")
-CONFIGURE_FILE(warftpd_config.h.template ${CONF_PATH})
+add_subdirectory(src/lib)
+add_subdirectory(src/daemon)
 
-message(STATUS "Binary files will be located here: ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+# if (WARFTPD_WITH_UNIT_TESTS)
+#     add_subdirectory(tests)
+# endif()
+
+CONFIGURE_FILE(config.h.template ${CMAKE_BINARY_DIR}/generated-include/warftpd/config.h)
 

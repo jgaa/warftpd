@@ -3,8 +3,6 @@
 
 This is a new implementation of the War FTP Daemon.
 
-2017-10-18: Status: *The build is currently broken*. Should be fixed within a week.
-
 War FTP Daemon consists of three libraries written by Jarle (jgaa) Aase.
 
     warftpd (GPLv3)
@@ -34,37 +32,5 @@ features that have made the War FTP Daemon popular for 20 years.
 Other dependencies:
   - OpenSSL (or a plug-in compatible library)
   - boost
-  - zlib
 
-
-## Functional Testing:
-
-1) Testing the wfde library:
-
-    In order to run the functional tests, you first run basic_tests.py, and then you start
-    the wfde test FTP server with a configuration-file created by the test script.
-
-    Example:
-    [In a shell session in the warftpd dir]:
-    ~/tmp/warftpd$ ./externals/wfde/tests/functional/basic_tests.py
-    Creating path: /home/jgaa/src/wfde/test-tmp/ftproot
-    Creating path: /home/jgaa/src/wfde/test-tmp/client
-    Creating path: /home/jgaa/src/wfde/test-tmp/ftproot/home/jgaa
-    Creating path: /home/jgaa/src/wfde/test-tmp/ftproot/upload
-    Creating path: /home/jgaa/src/wfde/test-tmp/ftproot/pub/sub/sub2
-    Creating path: /home/jgaa/src/wfde/test-tmp/ftproot/empty
-    Creating missing test-files for download
-    This may take a few minutes...
-    Ready to start tests on ftp-root: /home/jgaa/src/wfde/test-tmp/ftproot
-    Start the server with config-path to /home/jgaa/src/wfde/test-tmp/wfded.conf
-    Press ENTER when ready
-    ...
-
-    [In another shell session]:
-    ~/tmp/warftpd$ ./dbuild/externals/wfde/tests/wfded/wfdedD -c /home/jgaa/tmp/warftpd/test-tmp/wfded.conf
-    ...
-
-    Now, press ENTER in the first shell session and wait for the tests to finish.
-
-    Press ^C in the second session to kill the FTP server when the tests have finished.
-
+*Status*: Under development

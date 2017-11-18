@@ -1,6 +1,6 @@
 #pragma once
 
-#include "warftpd/warftpd.h"
+#include <warftpd/warftpd.h>
 
 namespace warftpd {
 

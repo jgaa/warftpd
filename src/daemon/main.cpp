@@ -7,12 +7,12 @@
 
 #include <boost/program_options.hpp>
 #include <boost/optional.hpp>
-#include <log/WarLog.h>
-#include "war_error_handling.h"
+#include <warlib/WarLog.h>
+#include <warlib/error_handling.h>
 #ifdef WIN32
-#   include "win/minidump.h"
+#   include <warlib/win/minidump.h>
 #endif
-#include "warftpd/warftpd.h"
+#include <warftpd/warftpd.h>
 #include "Daemon.h"
 
 using namespace std;

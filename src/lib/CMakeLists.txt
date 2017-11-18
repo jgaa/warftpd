@@ -1,31 +1,31 @@
-# Server Library
-project(vgtdsl)
+project(libwarftpd VERSION 4.0 LANGUAGES CXX)
 set(ACTUAL_SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/db/DatabaseImplSqlite.cpp
-        ${CMAKE_CURRENT_SOURCE_DIR}/db/DatabaseImpl.cpp
-        AuthManagerImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/db/DatabaseImplSqlite.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/db/DatabaseImpl.cpp
+    AuthManagerImpl.cpp
     )
 set(HEADERS
-   ${CMAKE_CURRENT_SOURCE_DIR}/db/ 
-   )
-
-include_directories(
     ${WARFTPD_ROOT_DIR}/include/warftpd/warftpd.h
     ${WARFTPD_ROOT_DIR}/include/warftpd/Database.h
     ${CMAKE_CURRENT_SOURCE_DIR}/db/DatabaseImpl.h
-    )
+   )
 
 if (WIN32)
-    ADD_MSVC_PRECOMPILED_HEADER(${WARFTPD_ROOT_DIR}/include/warftpd/warftpd.h pch.cpp ACTUAL_SOURCES)
-    add_definitions(-DWARFTPD_PCH)
     set(SOURCES ${ACTUAL_SOURCES} pch.cpp ${HEADERS} ${RESFILES})
 else()
     set(SOURCES ${ACTUAL_SOURCES})
-    set(PTHERAD ptherad)
 endif()
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
 add_library(libwarftpd ${SOURCES})
-set_target_properties(libwarftpd PROPERTIES DEBUG_OUTPUT_NAME warftpdD)
-target_link_libraries(libwarftpd ${DEFAULT_LIBRARIES} sqlpp11-connector-sqlite3 sqlite3 wfde)
+add_dependencies(libwarftpd externalWarlib externalWfde externalSqlpp11 externalSqlpp11Sqlite3)
+set_property(TARGET libwarftpd PROPERTY CXX_STANDARD 14)
+target_include_directories(libwarftpd
+    PUBLIC $<BUILD_INTERFACE:${WARFTPD_ROOT}/include> $<INSTALL_INTERFACE:include>
+    PRIVATE ${CMAKE_BINARY_DIR}/generated-include/
+    PRIVATE ${WARFTPD_ROOT}/src/libwarftpd
+    PRIVATE ${EXTERNAL_PROJECTS_PREFIX}/src/externalHinnatDate/include/date
+    PRIVATE PRIVATE ${SQLITE3_INCLUDE_DIRS}
+    )
+target_link_libraries(libwarftpd PUBLIC wfde ${SQLITE3_LIBRARY})
+target_compile_definitions(${PROJECT_NAME} PUBLIC -DBOOST_COROUTINES_NO_DEPRECATION_WARNING=1)
+target_compile_definitions(${PROJECT_NAME} PUBLIC -DBOOST_COROUTINE_NO_DEPRECATION_WARNING=1)

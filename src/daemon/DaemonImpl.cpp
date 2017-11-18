@@ -6,11 +6,11 @@
 
 #include <vector>
 #include <boost/lexical_cast.hpp>
-#include <log/WarLog.h>
-#include "war_error_handling.h"
-#include <tasks/WarThreadpool.h>
-#include "warftpd/warftpd.h"
-#include "warftpd/Database.h"
+#include <warlib/WarLog.h>
+#include <warlib/error_handling.h>
+#include <warlib/WarThreadpool.h>
+#include <warftpd/warftpd.h>
+#include <warftpd/Database.h>
 #include "Daemon.h"
 
 using namespace std;
